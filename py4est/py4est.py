@@ -4,10 +4,15 @@
 r""""""
 
 from ctypes import *
+import ctypes.util
 from mpi4py import MPI
 
-LIBSCPATH="/Users/aron/sandbox/p4est-dev/local/lib/libsc.dylib"
-LIBP4ESTPATH="/Users/aron/sandbox/p4est-dev/local/lib/libp4est.dylib"
+import os
+
+P4EST_DIR=os.getenv('P4EST_DIR')
+
+LIBSCPATH=ctypes.util.find_library(os.path.join(P4EST_DIR,'lib','libsc'))
+LIBP4ESTPATH=ctypes.util.find_library(os.path.join(P4EST_DIR,'lib','libp4est'))
 
 # Wrap p4est composite structures with ctypes
 class sc_array (Structure):
