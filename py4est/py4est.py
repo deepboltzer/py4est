@@ -55,6 +55,7 @@ class pp (Structure):
 pp_pointer = POINTER (pp)
 
 def pp_get_num_leaves (pp):
+        """This is just for convenience"""
         return pp.contents.mesh.contents.local_num_quadrants
 
 # Wrap leaf iterator with ctypes
@@ -84,6 +85,22 @@ libp4est.p4est_wrap_leaf_next.restype = leaf_pointer;
 
 class Py4estDomainTest:
     def __init__ (self):
+
+        """
+        Main idea: Below is a loop that walks through all tree leaves
+        on the local processor.  For each leaf, the ctypes-wrapped p4est
+        data structures can be queried to obtain neighbor information.
+        Based on this information, pyclaw objects that represent the
+        leaves can be created, and communication patterns can be set up
+        to transfer ghost/neighbor values.
+
+        For the encoding convention see the comment blocks in
+        p4est_connectivity.h and p4est_mesh.h.  These can be used to
+        create lookup tables and permutations between face neighbors.
+
+        Currently, p4est_mesh only records face neighbors, not edges
+        and corners.  This will be extended in the near future.
+        """
 
         # Call this once per program before any other p4est function
         libp4est.p4est_wrap_init ()
