@@ -24,7 +24,7 @@ if (P4EST_HACK_SOEXT):
     LIBSCPATH = os.path.join (P4EST_DIR, 'lib', 'libsc.so')
     LIBP4ESTPATH = os.path.join (P4EST_DIR, 'lib', 'libp4est.so')
 
-# Wrap p4est composite structures with ctypes
+# Wrap p4est composite structures with ctypes.  All indices are 0-based.
 class sc_array (Structure):
         _fields_ = [("elem_size", c_ulonglong),
                     ("elem_count", c_ulonglong),
@@ -60,10 +60,10 @@ def pp_get_num_leaves (pp):
 # Wrap leaf iterator with ctypes
 class leaf (Structure):
         _fields_ = [("pp", pp_pointer),
-                    ("level", c_int),
-                    ("which_tree", c_int),
-                    ("which_quad", c_int),
-                    ("total_quad", c_int),
+                    ("level", c_int),           # refinement level of leaf
+                    ("which_tree", c_int),      # index of octree
+                    ("which_quad", c_int),      # leaf index in this octree
+                    ("total_quad", c_int),      # leaf index on this proc
                     ("tree", c_void_p),
                     ("quad", c_void_p),
                     ("lowerleft", c_double * 3),
