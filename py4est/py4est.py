@@ -83,14 +83,14 @@ libp4est.p4est_wrap_leaf_first.restype = leaf_pointer;
 libp4est.p4est_wrap_leaf_next.argtype = leaf_pointer;
 libp4est.p4est_wrap_leaf_next.restype = leaf_pointer;
 
-class Py4estDomainTest:
+class Py4estDemo:
     def __init__ (self):
 
         """
         Main idea: Below is a loop that walks through all tree leaves
         on the local processor.  For each leaf, the ctypes-wrapped p4est
         data structures can be queried to obtain neighbor information.
-        Based on this information, pyclaw objects that represent the
+        Based on this information, python objects that represent the
         leaves can be created, and communication patterns can be set up
         to transfer ghost/neighbor values.
 
@@ -104,55 +104,47 @@ class Py4estDomainTest:
 
         # Call this once per program before any other p4est function
         libp4est.p4est_wrap_init ()
-       
+
         # Create a 2D p4est internal state on a square
-        initial_level = 0
+        initial_level = 1
         self.wrap = libp4est.p4est_wrap_new (initial_level)
-        self.num_leaves = wrap_get_num_leaves (self.wrap)
-        
+        num_leaves = wrap_get_num_leaves (self.wrap)
+
         # Number of faces of a leaf (4 in 2D, 6 in 3D)
         P4EST_FACES = self.wrap.contents.P4EST_FACES
-        print "Py faces", P4EST_FACES, "leaves", self.num_leaves
-        
+        print "Py faces", P4EST_FACES, "leaves", num_leaves
+
         # Mesh is the lookup table for leaf neighbors
         mesh = self.wrap.contents.mesh
-       
+
         # Use the leaf iterator to loop over all leafs
         # If only a loop over leaf indices is needed,
-        # do instead: for leafindex in range (0, self.num_leaves)
+        # do instead: for leafindex in range (0, num_leaves)
         leaf = libp4est.p4est_wrap_leaf_first (self.wrap)
-        self.patches = []
-       
-        # patch_counter = 0
-        # Use self.num_leaves instead
-        # Should be the same as the size of self.patches after this loop
         while (leaf):
-                # patch_counter += 1
-                # Within this loop the leaf counter is leaf.contents.total_quad
-                # All indices in the p4est structures are 0-based
-                
-                # This is a demonstration to show off the structure
-           print "Py leaf level", leaf.contents.level, \
-               "tree", leaf.contents.which_tree, \
-               "tree_leaf", leaf.contents.which_quad, \
-               "local_leaf", leaf.contents.total_quad
-           for face in range (P4EST_FACES):
-               print "Py leaf face", face, "leaf", \
-  mesh.contents.quad_to_quad [P4EST_FACES * leaf.contents.total_quad + face]
+            # Within this loop the leaf counter is leaf.contents.total_quad
+            # All indices in the p4est structures are 0-based
 
-               #           x = pyclaw.Dimension('x', leaf.contents.lowerleft[0] , leaf.contents.upperright[0], 64)
-               #           y = pyclaw.Dimension('y', leaf.contents.lowerleft[1] , leaf.contents.upperright[1], 64)
+            print "Py leaf level", leaf.contents.level, \
+                "tree", leaf.contents.which_tree, \
+                "tree_leaf", leaf.contents.which_quad, \
+                "local_leaf", leaf.contents.total_quad
+            print "Py leaf lower left", \
+                leaf.contents.lowerleft[0], leaf.contents.lowerleft[1], \
+                "upper right", \
+                leaf.contents.upperright[0], leaf.contents.upperright[1]
+            for face in range (P4EST_FACES):
+                print "Py leaf face", face, "neighbor leaf", \
+ mesh.contents.quad_to_quad [P4EST_FACES * leaf.contents.total_quad + face]
 
-               #           patch = pyclaw.geometry.Patch ([x, y])
-               #           patch.patch_index = leaf.contents.total_quad
-               #           self.patches.append (patch)
+            # Advance the leaf iteration
+            leaf = libp4est.p4est_wrap_leaf_next (leaf)
 
-           leaf = libp4est.p4est_wrap_leaf_next (leaf)
-       
     def __del__ (self):
+        # Free the 2D p4est internal state
         libp4est.p4est_wrap_destroy (self.wrap)    
-        
+
         # Call this once at the end of program
         libp4est.p4est_wrap_finalize ()
 
-ptest = Py4estDomainTest()
+pdemo = Py4estDemo ()
