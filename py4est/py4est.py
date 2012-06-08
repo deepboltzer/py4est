@@ -10,9 +10,19 @@ from mpi4py import MPI
 import os
 
 P4EST_DIR=os.getenv('P4EST_DIR')
+P4EST_HACK_SOEXT=os.getenv('P4EST_HACK_SOEXT')
+
+#print P4EST_DIR
 
 LIBSCPATH=ctypes.util.find_library(os.path.join(P4EST_DIR,'lib','libsc'))
 LIBP4ESTPATH=ctypes.util.find_library(os.path.join(P4EST_DIR,'lib','libp4est'))
+
+#print LIBSCPATH
+#print LIBP4ESTPATH
+
+if (P4EST_HACK_SOEXT):
+    LIBSCPATH = os.path.join (P4EST_DIR, 'lib', 'libsc.so')
+    LIBP4ESTPATH = os.path.join (P4EST_DIR, 'lib', 'libp4est.so')
 
 # Wrap p4est composite structures with ctypes
 class sc_array (Structure):
