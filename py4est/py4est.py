@@ -82,6 +82,7 @@ class Py4estDomainTest:
         
         # Number of faces of a leaf (4 in 2D, 6 in 3D)
         P4EST_FACES = self.pp.contents.P4EST_FACES
+        print "Py faces", P4EST_FACES, "leaves", self.num_leaves
         
         # Mesh is the lookup table for leaf neighbors
         mesh = self.pp.contents.mesh
@@ -107,19 +108,18 @@ class Py4estDomainTest:
                "local_leaf", leaf.contents.total_quad
            for face in range (P4EST_FACES):
                print "Py leaf face", face, "leaf", \
-                   
-               mesh.contents.quad_to_quad [P4EST_FACES * leaf.contents.total_quad + face]
-               
+  mesh.contents.quad_to_quad [P4EST_FACES * leaf.contents.total_quad + face]
+
                #           x = pyclaw.Dimension('x', leaf.contents.lowerleft[0] , leaf.contents.upperright[0], 64)
                #           y = pyclaw.Dimension('y', leaf.contents.lowerleft[1] , leaf.contents.upperright[1], 64)
-           
+
                #           patch = pyclaw.geometry.Patch ([x, y])
                #           patch.patch_index = leaf.contents.total_quad
                #           self.patches.append (patch)
-               leaf = libp4est.p4est_wrap_leaf_next (leaf)
+
+           leaf = libp4est.p4est_wrap_leaf_next (leaf)
        
     def __del__ (self):
         libp4est.p4est_wrap_destroy (self.pp)    
-
 
 ptest = Py4estDomainTest()
