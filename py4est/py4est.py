@@ -43,7 +43,7 @@ class mesh (Structure):
                     ("quad_to_face", POINTER (c_byte)),
                     ("quad_to_half", sc_array_pointer)]
 mesh_pointer = POINTER (mesh)
-class pp (Structure):
+class wrap (Structure):
         _fields_ = [("P4EST_DIM", c_int),       # space dimension
                     ("P4EST_HALF", c_int),      # small faces   2^(dim - 1)
                     ("P4EST_FACES", c_int),     # faces around  2 * dim
@@ -52,15 +52,15 @@ class pp (Structure):
                     ("p4est", c_void_p),
                     ("ghost", c_void_p),
                     ("mesh", mesh_pointer)]
-pp_pointer = POINTER (pp)
+wrap_pointer = POINTER (wrap)
 
-def pp_get_num_leaves (pp):
+def wrap_get_num_leaves (wrap):
         """This is just for convenience"""
-        return pp.contents.mesh.contents.local_num_quadrants
+        return wrap.contents.mesh.contents.local_num_quadrants
 
 # Wrap leaf iterator with ctypes
 class leaf (Structure):
-        _fields_ = [("pp", pp_pointer),
+        _fields_ = [("wrap", wrap_pointer),
                     ("level", c_int),           # refinement level of leaf
                     ("which_tree", c_int),      # index of octree
                     ("which_quad", c_int),      # leaf index in this octree
@@ -76,9 +76,9 @@ libsc = CDLL(LIBSCPATH,mode=RTLD_GLOBAL)
 # Dynamically link in the  p4est interface
 libp4est = CDLL (LIBP4ESTPATH)
 libp4est.p4est_wrap_new.argtype = c_int;
-libp4est.p4est_wrap_new.restype = pp_pointer;
-libp4est.p4est_wrap_destroy.argtype = pp_pointer;
-libp4est.p4est_wrap_leaf_first.argtype = pp_pointer;
+libp4est.p4est_wrap_new.restype = wrap_pointer;
+libp4est.p4est_wrap_destroy.argtype = wrap_pointer;
+libp4est.p4est_wrap_leaf_first.argtype = wrap_pointer;
 libp4est.p4est_wrap_leaf_first.restype = leaf_pointer;
 libp4est.p4est_wrap_leaf_next.argtype = leaf_pointer;
 libp4est.p4est_wrap_leaf_next.restype = leaf_pointer;
@@ -107,20 +107,20 @@ class Py4estDomainTest:
        
         # Create a 2D p4est internal state on a square
         initial_level = 0
-        self.pp = libp4est.p4est_wrap_new (initial_level)
-        self.num_leaves = pp_get_num_leaves (self.pp)
+        self.wrap = libp4est.p4est_wrap_new (initial_level)
+        self.num_leaves = wrap_get_num_leaves (self.wrap)
         
         # Number of faces of a leaf (4 in 2D, 6 in 3D)
-        P4EST_FACES = self.pp.contents.P4EST_FACES
+        P4EST_FACES = self.wrap.contents.P4EST_FACES
         print "Py faces", P4EST_FACES, "leaves", self.num_leaves
         
         # Mesh is the lookup table for leaf neighbors
-        mesh = self.pp.contents.mesh
+        mesh = self.wrap.contents.mesh
        
         # Use the leaf iterator to loop over all leafs
         # If only a loop over leaf indices is needed,
         # do instead: for leafindex in range (0, self.num_leaves)
-        leaf = libp4est.p4est_wrap_leaf_first (self.pp)
+        leaf = libp4est.p4est_wrap_leaf_first (self.wrap)
         self.patches = []
        
         # patch_counter = 0
@@ -150,7 +150,7 @@ class Py4estDomainTest:
            leaf = libp4est.p4est_wrap_leaf_next (leaf)
        
     def __del__ (self):
-        libp4est.p4est_wrap_destroy (self.pp)    
+        libp4est.p4est_wrap_destroy (self.wrap)    
         
         # Call this once at the end of program
         libp4est.p4est_wrap_finalize ()
