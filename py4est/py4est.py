@@ -84,6 +84,9 @@ libp4est.p4est_wrap_leaf_next.restype = leaf_pointer;
 
 class Py4estDomainTest:
     def __init__ (self):
+
+        # Call this once per program before any other p4est function
+        libp4est.p4est_wrap_init ()
        
         # Create a 2D p4est internal state on a square
         initial_level = 0
@@ -131,5 +134,8 @@ class Py4estDomainTest:
        
     def __del__ (self):
         libp4est.p4est_wrap_destroy (self.pp)    
+        
+        # Call this once at the end of program
+        libp4est.p4est_wrap_finalize ()
 
 ptest = Py4estDomainTest()
