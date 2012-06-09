@@ -38,7 +38,7 @@ Wilcox:
 "Towards Adaptive Mesh PDE Simulations on Petascale Computers,"
 Proceedings of Teragrid '08.
 
-If this library turns out useful for you, we would be grateful for a citation.
+If this library turns out useful, we would be grateful for these citations.
 """
 
 from ctypes import *
@@ -162,6 +162,7 @@ class Py4estDemo:
 
         # Mesh is the lookup table for leaf neighbors
         # Note that match_aux changes in p4est_wrap_refine and _partition
+        # Note that wrap.contents also changes so it is better not to use wrapc
         mesh = wrapc.mesh_aux if wrapc.match_aux else wrapc.mesh
 
         # Use the leaf iterator to loop over all leafs
