@@ -54,7 +54,8 @@ class wrap (Structure):
                     ("ghost", c_void_p),
                     ("mesh", mesh_pointer),
                     ("ghost_aux", c_void_p),
-                    ("mesh_aux", mesh_pointer)]
+                    ("mesh_aux", mesh_pointer),
+                    ("match_aux", c_int)]       # bool: p4est matches _aux
 wrap_pointer = POINTER (wrap)
 
 def wrap_get_num_leaves (wrap):
@@ -114,14 +115,16 @@ class Py4estDemo:
         # Create a 2D p4est internal state on a square
         initial_level = 1
         self.wrap = libp4est.p4est_wrap_new (initial_level)
+        wrapc = self.wrap.contents
         num_leaves = wrap_get_num_leaves (self.wrap)
 
         # Number of faces of a leaf (4 in 2D, 6 in 3D)
-        P4EST_FACES = self.wrap.contents.P4EST_FACES
+        P4EST_FACES = wrapc.P4EST_FACES
         print "Py faces", P4EST_FACES, "leaves", num_leaves
 
         # Mesh is the lookup table for leaf neighbors
-        mesh = self.wrap.contents.mesh
+        # Note that match_aux changes in p4est_wrap_refine and _partition
+        mesh = wrapc.mesh_aux if wrapc.match_aux else wrapc.mesh
 
         # Use the leaf iterator to loop over all leafs
         # If only a loop over leaf indices is needed,
