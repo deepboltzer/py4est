@@ -1,7 +1,45 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-r""""""
+# This file is part of py4est.
+# py4est is a python wrapper module for p4est.
+# p4est is a C library to manage a collection (a forest) of multiple
+# connected adaptive quadtrees or octrees in parallel; see www.p4est.org/.
+# 
+# py4est copyright (C) 2012 Carsten Burstedde and Aron Ahmadia
+# 
+# py4est is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# py4est is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with py4est; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+"""
+py4est wraps the p4est functionality for static and dynamic AMR in Python.
+
+The p4est core algorithms are documented in
+Carsten Burstedde, Lucas C. Wilcox, and Omar Ghattas:
+"p4est: Scalable Algorithms for Parallel Adaptive Mesh Refinement on Forests of
+Octrees,"
+SIAM Journal on Scientific Computing 33 No. 3 (2011), pages 1103-1133.
+
+The AMR pipeline and the interaction between the mesh and the fields that is
+behind the conventions in the py4est module are documented in
+Carsten Burstedde, Omar Ghattas, Georg Stadler, Tiankai Tu, and Lucas C.
+Wilcox:
+"Towards Adaptive Mesh PDE Simulations on Petascale Computers,"
+Proceedings of Teragrid '08.
+
+If this library turns out useful for you, we would be grateful for a citation.
+"""
 
 from ctypes import *
 import ctypes.util

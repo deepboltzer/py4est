@@ -1,0 +1,16 @@
+py4est wraps the p4est functionality for static and dynamic AMR in Python.
+
+The p4est core algorithms are documented in
+Carsten Burstedde, Lucas C. Wilcox, and Omar Ghattas:
+"p4est: Scalable Algorithms for Parallel Adaptive Mesh Refinement on Forests of
+Octrees,"
+SIAM Journal on Scientific Computing 33 No. 3 (2011), pages 1103-1133.
+
+The AMR pipeline and the interaction between the mesh and the fields that is
+behind the conventions in the py4est module are documented in
+Carsten Burstedde, Omar Ghattas, Georg Stadler, Tiankai Tu, and Lucas C.
+Wilcox:
+"Towards Adaptive Mesh PDE Simulations on Petascale Computers,"
+Proceedings of Teragrid '08.
+
+If this library turns out useful for you, we would be grateful for a citation.
