@@ -50,8 +50,11 @@ class wrap (Structure):
                     ("P4EST_CHILDREN", c_int),  # children      2^dim
                     ("conn", c_void_p),
                     ("p4est", c_void_p),
+                    ("flags", POINTER (c_byte)),        # one byte per leaf
                     ("ghost", c_void_p),
-                    ("mesh", mesh_pointer)]
+                    ("mesh", mesh_pointer),
+                    ("ghost_aux", c_void_p),
+                    ("mesh_aux", mesh_pointer)]
 wrap_pointer = POINTER (wrap)
 
 def wrap_get_num_leaves (wrap):
@@ -78,6 +81,9 @@ libp4est = CDLL (LIBP4ESTPATH)
 libp4est.p4est_wrap_new.argtype = c_int;
 libp4est.p4est_wrap_new.restype = wrap_pointer;
 libp4est.p4est_wrap_destroy.argtype = wrap_pointer;
+libp4est.p4est_wrap_refine.argtype = wrap_pointer;
+libp4est.p4est_wrap_partition.argtype = wrap_pointer;
+libp4est.p4est_wrap_complete.argtype = wrap_pointer;
 libp4est.p4est_wrap_leaf_first.argtype = wrap_pointer;
 libp4est.p4est_wrap_leaf_first.restype = leaf_pointer;
 libp4est.p4est_wrap_leaf_next.argtype = leaf_pointer;
