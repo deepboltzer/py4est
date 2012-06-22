@@ -26,7 +26,7 @@
 py4est wraps the p4est functionality for static and dynamic AMR in Python.
 
 Currently some important C structs are wrapped with ctypes.
-The code relies on the following assupmtions about p4est_base.h.
+The code relies on the following assumptions about p4est_base.h.
 typedef int32_t     p4est_qcoord_t;
 typedef int32_t     p4est_topidx_t;
 typedef int32_t     p4est_locidx_t;
