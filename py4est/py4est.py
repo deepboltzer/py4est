@@ -50,7 +50,7 @@ Proceedings of Teragrid '08.
 If this library turns out useful, we would be grateful for these citations.
 """
 
-from ctypes import *
+import ctypes
 import ctypes.util
 from mpi4py import MPI
 
@@ -84,61 +84,61 @@ py4est_double = ctypes.c_double
 py4est_pointer = ctypes.c_void_p
 
 # Wrap p4est composite structures with ctypes.  All indices are 0-based.
-class sc_array (Structure):
-        _fields_ = [("elem_size", c_ulonglong),
-                    ("elem_count", c_ulonglong),
-                    ("byte_alloc", c_longlong),
-                    ("array", c_void_p)]
-sc_array_pointer = POINTER (sc_array)
-class mesh (Structure):
-        _fields_ = [("local_num_vertices", c_int),
-                    ("local_num_quadrants", c_int),
-                    ("ghost_num_quadrants", c_int),
-                    ("vertices", c_void_p),
-                    ("quad_to_vertex", POINTER (c_int)),
-                    ("ghost_to_proc", POINTER (c_int)),
-                    ("ghost_to_index", POINTER (c_int)),
-                    ("quad_to_quad", POINTER (c_int)),
-                    ("quad_to_face", POINTER (c_byte)),
+class sc_array (ctypes.Structure):
+        _fields_ = [("elem_size", py4est_size_t),
+                    ("elem_count", py4est_size_t),
+                    ("byte_alloc", py4est_ssize_t),
+                    ("array", py4est_pointer)]
+sc_array_pointer = ctypes.POINTER (sc_array)
+class mesh (ctypes.Structure):
+        _fields_ = [("local_num_vertices", py4est_locidx),
+                    ("local_num_quadrants", py4est_locidx),
+                    ("ghost_num_quadrants", py4est_locidx),
+                    ("vertices", py4est_pointer),
+                    ("quad_to_vertex", ctypes.POINTER (py4est_locidx)),
+                    ("ghost_to_proc", ctypes.POINTER (py4est_int)),
+                    ("ghost_to_index", ctypes.POINTER (py4est_locidx)),
+                    ("quad_to_quad", ctypes.POINTER (py4est_locidx)),
+                    ("quad_to_face", ctypes.POINTER (py4est_int8)),
                     ("quad_to_half", sc_array_pointer)]
-mesh_pointer = POINTER (mesh)
-class wrap (Structure):
-        _fields_ = [("P4EST_DIM", c_int),       # space dimension
-                    ("P4EST_HALF", c_int),      # small faces   2^(dim - 1)
-                    ("P4EST_FACES", c_int),     # faces around  2 * dim
-                    ("P4EST_CHILDREN", c_int),  # children      2^dim
-                    ("conn", c_void_p),
-                    ("p4est", c_void_p),
-                    ("flags", POINTER (c_byte)),        # one byte per leaf
-                    ("ghost", c_void_p),
+mesh_pointer = ctypes.POINTER (mesh)
+class wrap (ctypes.Structure):
+        _fields_ = [("P4EST_DIM", py4est_int),  # space dimension
+                    ("P4EST_HALF", py4est_int), # small faces      2^(dim - 1)
+                    ("P4EST_FACES", py4est_int),        # faces    2 * dim
+                    ("P4EST_CHILDREN", py4est_int),     # children 2^dim
+                    ("conn", py4est_pointer),
+                    ("p4est", py4est_pointer),
+                    ("flags", ctypes.POINTER (py4est_int8)),    # one per leaf
+                    ("ghost", py4est_pointer),
                     ("mesh", mesh_pointer),
-                    ("ghost_aux", c_void_p),
+                    ("ghost_aux", py4est_pointer),
                     ("mesh_aux", mesh_pointer),
-                    ("match_aux", c_int)]       # bool: p4est matches _aux
-wrap_pointer = POINTER (wrap)
+                    ("match_aux", py4est_int)]  # bool: p4est matches _aux
+wrap_pointer = ctypes.POINTER (wrap)
 
 def wrap_get_num_leaves (wrap):
         """This is just for convenience"""
         return wrap.contents.mesh.contents.local_num_quadrants
 
 # Wrap leaf iterator with ctypes
-class leaf (Structure):
+class leaf (ctypes.Structure):
         _fields_ = [("wrap", wrap_pointer),
-                    ("level", c_int),           # refinement level of leaf
-                    ("which_tree", c_int),      # index of octree
-                    ("which_quad", c_int),      # leaf index in this octree
-                    ("total_quad", c_int),      # leaf index on this proc
-                    ("tree", c_void_p),
-                    ("quad", c_void_p),
-                    ("lowerleft", c_double * 3),
-                    ("upperright", c_double * 3)]
-leaf_pointer = POINTER (leaf)
+                    ("level", py4est_int),      # refinement level of leaf
+                    ("which_tree", py4est_topidx),      # index of octree
+                    ("which_quad", py4est_locidx),      # leaf in this octree
+                    ("total_quad", py4est_locidx),      # leaf on this proc
+                    ("tree", py4est_pointer),
+                    ("quad", py4est_pointer),
+                    ("lowerleft", py4est_double * 3),
+                    ("upperright", py4est_double * 3)]
+leaf_pointer = ctypes.POINTER (leaf)
 
-libsc = CDLL(LIBSCPATH,mode=RTLD_GLOBAL)
+libsc = ctypes.CDLL(LIBSCPATH, mode=ctypes.RTLD_GLOBAL)
  
 # Dynamically link in the  p4est interface
-libp4est = CDLL (LIBP4ESTPATH)
-libp4est.p4est_wrap_new.argtype = c_int;
+libp4est = ctypes.CDLL (LIBP4ESTPATH)
+libp4est.p4est_wrap_new.argtype = py4est_int;
 libp4est.p4est_wrap_new.restype = wrap_pointer;
 libp4est.p4est_wrap_destroy.argtype = wrap_pointer;
 libp4est.p4est_wrap_refine.argtype = wrap_pointer;
