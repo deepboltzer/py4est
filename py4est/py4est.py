@@ -90,6 +90,20 @@ class sc_array (ctypes.Structure):
                     ("byte_alloc", py4est_ssize_t),
                     ("array", py4est_pointer)]
 sc_array_pointer = ctypes.POINTER (sc_array)
+class connectivity (ctypes.Structure):
+        _fields_ = [("num_vertices", py4est_topidx),
+                    ("num_trees", py4est_topidx),
+                    ("num_corners", py4est_topidx),
+                    ("vertices", ctypes.POINTER (py4est_double)),
+                    ("tree_to_vertex", ctypes.POINTER (py4est_topidx)),
+                    ("tree_to_attr", ctypes.POINTER (py4est_int8)),
+                    ("tree_to_tree", ctypes.POINTER (py4est_topidx)),
+                    ("tree_to_face", ctypes.POINTER (py4est_int8)),
+                    ("tree_to_corner", ctypes.POINTER (py4est_topidx)),
+                    ("ctt_offset", ctypes.POINTER (py4est_topidx)),
+                    ("corner_to_tree", ctypes.POINTER (py4est_topidx)),
+                    ("corner_to_corner", ctypes.POINTER (py4est_int8))]
+connectivity_pointer = ctypes.POINTER (connectivity)
 class mesh (ctypes.Structure):
         _fields_ = [("local_num_vertices", py4est_locidx),
                     ("local_num_quadrants", py4est_locidx),
@@ -107,7 +121,7 @@ class wrap (ctypes.Structure):
                     ("P4EST_HALF", py4est_int), # small faces      2^(dim - 1)
                     ("P4EST_FACES", py4est_int),        # faces    2 * dim
                     ("P4EST_CHILDREN", py4est_int),     # children 2^dim
-                    ("conn", py4est_pointer),
+                    ("conn", connectivity_pointer),
                     ("p4est", py4est_pointer),
                     ("flags", ctypes.POINTER (py4est_int8)),    # one per leaf
                     ("ghost", py4est_pointer),
