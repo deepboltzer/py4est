@@ -1,5 +1,14 @@
 py4est wraps the p4est functionality for static and dynamic AMR in Python.
 
+Currently some important C structs are wrapped with ctypes.
+The code relies on the following assupmtions about p4est_base.h.
+typedef int32_t     p4est_qcoord_t;
+typedef int32_t     p4est_topidx_t;
+typedef int32_t     p4est_locidx_t;
+typedef int64_t     p4est_gloidx_t;
+Their python counterparts are defined at the beginning of py4est.py
+and they need to be changed whenever the p4est typedefs change.
+
 The p4est core algorithms are documented in
 Carsten Burstedde, Lucas C. Wilcox, and Omar Ghattas:
 "p4est: Scalable Algorithms for Parallel Adaptive Mesh Refinement on Forests of

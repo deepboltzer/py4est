@@ -25,6 +25,15 @@
 """
 py4est wraps the p4est functionality for static and dynamic AMR in Python.
 
+Currently some important C structs are wrapped with ctypes.
+The code relies on the following assupmtions about p4est_base.h.
+typedef int32_t     p4est_qcoord_t;
+typedef int32_t     p4est_topidx_t;
+typedef int32_t     p4est_locidx_t;
+typedef int64_t     p4est_gloidx_t;
+Their python counterparts are defined at the beginning of py4est.py
+and they need to be changed whenever the p4est typedefs change.
+
 The p4est core algorithms are documented in
 Carsten Burstedde, Lucas C. Wilcox, and Omar Ghattas:
 "p4est: Scalable Algorithms for Parallel Adaptive Mesh Refinement on Forests of
@@ -61,6 +70,18 @@ LIBP4ESTPATH=ctypes.util.find_library(os.path.join(P4EST_DIR,'lib','libp4est'))
 if (P4EST_HACK_SOEXT):
     LIBSCPATH = os.path.join (P4EST_DIR, 'lib', 'libsc.so')
     LIBP4ESTPATH = os.path.join (P4EST_DIR, 'lib', 'libp4est.so')
+
+# Wrap p4est integer typedefs
+py4est_int = ctypes.c_int
+py4est_int8 = ctypes.c_int8
+py4est_size_t = ctypes.c_size_t
+py4est_ssize_t = ctypes.c_size_t        # c_ssize_t is only in 2.7
+py4est_qcoord = ctypes.c_int32
+py4est_topidx = ctypes.c_int32
+py4est_locidx = ctypes.c_int32
+py4est_gloidx = ctypes.c_int64
+py4est_double = ctypes.c_double
+py4est_pointer = ctypes.c_void_p
 
 # Wrap p4est composite structures with ctypes.  All indices are 0-based.
 class sc_array (Structure):
